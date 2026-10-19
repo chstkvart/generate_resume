@@ -13,6 +13,7 @@ from app.models import Resume
 from app.services.form_parser import parse_resume_form
 from app.services.job_market import analyze
 from app.services.pdf_generator import build_pdf
+from app.services.summary import NOT_ENOUGH_DATA
 
 bp = Blueprint("resume", __name__)
 
@@ -53,6 +54,21 @@ def generate():
         mimetype="application/pdf",
         as_attachment=True,
         download_name=_pdf_filename(result.resume.full_name),
+    )
+
+
+@bp.post("/api/summary")
+def summary_text():
+    """Текст «О себе» по текущему состоянию формы."""
+    result = parse_resume_form(request.form, MultiDict())
+    written = current_app.extensions["summary_writer"].write(result.resume)
+    if not written.text:
+        return jsonify(summary="", message=NOT_ENOUGH_DATA, source="", retry_after=0)
+    return jsonify(
+        summary=written.text,
+        message=written.message,
+        source=written.source,
+        retry_after=written.retry_after,
     )
 
 

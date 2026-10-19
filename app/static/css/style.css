@@ -259,6 +259,15 @@ button {
     border-radius: 4px;
 }
 
+.summary-generate {
+    margin-top: 12px;
+}
+
+.summary-generate:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
 .btn-link {
     margin-top: 8px;
     padding: 0;

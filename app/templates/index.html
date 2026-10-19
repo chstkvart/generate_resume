@@ -14,7 +14,8 @@
 
 <div class="layout">
 <form id="resume-form" method="post" action="{{ url_for('resume.generate') }}"
-      enctype="multipart/form-data" data-market-url="{{ url_for('resume.market') }}">
+      enctype="multipart/form-data" data-market-url="{{ url_for('resume.market') }}"
+      data-summary-url="{{ url_for('resume.summary_text') }}">
     <fieldset>
         <legend>Основная информация</legend>
         <div class="grid">
@@ -39,9 +40,6 @@
         </div>
         <label>Фотография (JPEG, PNG или WEBP, до 5 МБ)
             <input type="file" name="photo" accept="image/jpeg,image/png,image/webp">
-        </label>
-        <label>О себе
-            <textarea name="summary" rows="12" data-autogrow>{{ resume.summary }}</textarea>
         </label>
     </fieldset>
 
@@ -103,6 +101,17 @@
         </label>
     </fieldset>
 
+    <fieldset>
+        <legend>О себе</legend>
+        <p class="muted">Текст пишет бесплатная нейросеть по должности, опыту и навыкам.
+            Пока она отвечает, в поле может стоять короткий черновик.</p>
+        <textarea name="summary" id="summary" rows="6" data-autogrow>{{ resume.summary }}</textarea>
+        <button type="button" class="btn-secondary summary-generate" id="generate-summary">
+            Сгенерировать нейросетью
+        </button>
+        <p class="muted" id="summary-status" role="status"></p>
+    </fieldset>
+
     <button type="submit" class="btn-primary">Скачать PDF</button>
 </form>
 
@@ -131,5 +140,6 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/summary.js') }}"></script>
 <script src="{{ url_for('static', filename='js/market.js') }}"></script>
 {% endblock %}

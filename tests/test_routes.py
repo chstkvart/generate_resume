@@ -52,6 +52,35 @@ def test_generate_without_name_shows_errors(client):
     assert 'value="Разработчик"' in page  # введённые данные сохраняются
 
 
+def test_summary_block_is_the_last_section(client):
+    page = client.get("/").get_data(as_text=True)
+
+    skills = page.index("<legend>Навыки и языки</legend>")
+    about = page.index("<legend>О себе</legend>")
+    submit = page.index("Скачать PDF")
+    assert skills < about < submit
+    assert 'name="summary"' not in page[: page.index("<legend>Формат работы и зарплата</legend>")]
+
+
+def test_summary_api_builds_text(client):
+    response = client.post(
+        "/api/summary",
+        data={"title": "Python-разработчик", "skills": "Python, Flask", "english_level": "B1"},
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["summary"] == "Python-разработчик. Опираюсь на Python и Flask."
+    assert payload["message"] == ""
+
+
+def test_summary_api_without_facts(client):
+    payload = client.post("/api/summary", data={"full_name": "Иван"}).get_json()
+
+    assert payload["summary"] == ""
+    assert "должность" in payload["message"]
+
+
 def test_market_api_returns_report(client):
     response = client.post(
         "/api/market",
